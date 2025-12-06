@@ -53,7 +53,6 @@ def count_valid_IDs(ranges, IDs):
     valid_IDs = 0
     
     for id in IDs:
-        is_valid = False
         for r in ranges:
             if (r[0] <= id <= r[1]):
                 valid_IDs += 1
@@ -86,33 +85,16 @@ Process the database file again. How many ingredient IDs are considered to be fr
 def get_all_valid_IDs(ranges):
     new_ranges = []
 
-    for r in ranges:
-        next_ranges = [r]
-
-
+    for r1 in ranges:
         for r2 in new_ranges:
-            for r1 in next_ranges:
-                if (r1[0] > r2[1] or r1[1] < r2[0]):
-                    continue
-                elif (r1[0] >= r2[0] and r1[1] <= r2[1]):
-                    next_ranges.remove(r1)
-                    break
-                elif (r1[0] < r2[0] and r2[0] <= r1[1] <= r2[1]):
-                    next_ranges.remove(r1)
-                    next_ranges.append((r1[0], r2[0]-1))
-                elif (r2[0] <= r1[0] <= r2[1] and r1[1] > r2[1]):
-                    next_ranges.remove(r1)
-                    next_ranges.append((r2[1] + 1, r1[1]))
-                elif (r1[0] < r2[0] and r1[1] > r2[1]):
-                    next_ranges.remove(r1)
-                    next_ranges.append((r1[0], r2[0]-1))
-                    next_ranges.append((r2[1] + 1, r1[1]))
-        new_ranges.extend(next_ranges)
+            if (r1[1] < r2[0] or r1[0] > r2[1]):
+                continue
+            else:
+                r1 = (min(r1[0], r2[0]), max(r1[1], r2[1]))
+                new_ranges.remove(r2)
+        new_ranges.append(r1)
 
-    valid_IDs = 0
-    for r in new_ranges:
-        valid_IDs += (r[1] - r[0] + 1)
-    return valid_IDs
+    return sum([r[1] - r[0] + 1 for r in new_ranges])
 
 all_valid_IDs_count = get_all_valid_IDs(ranges)
 print(f'Number of all valid IDs: {all_valid_IDs_count}')
